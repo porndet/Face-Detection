@@ -1,4 +1,6 @@
-from Class.mysqlconnection import MariaDB
+# from Class.mysqlconnection import MariaDB
+import os
+import shutil
 
-# DB = MariaDB()
-# DB.InsertData(10, 20, "2022-09-13 11:46:10")
+
+

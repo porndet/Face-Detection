@@ -4,4 +4,4 @@ from Class.AI_Face import FaceDetection
 DetectionFace = FaceDetection()
 DetectionFace()
 
-print(DetectionFace)
+# print(DetectionFace)

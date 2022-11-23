@@ -1,10 +1,11 @@
 import cv2
 from deepface import DeepFace
 from datetime import datetime
+import shutil
+import os
 
 class FaceDetection:
     def __init__(self):
-
         self.haarcascades = {
             'face':  cv2.CascadeClassifier('./data/haarcascades/haarcascade_frontalface_default.xml'), 
             'eye': cv2.CascadeClassifier('./data/haarcascades/haarcascade_eye.xml'),
@@ -27,6 +28,16 @@ class FaceDetection:
         self.filenameFormat = "{:s}/{:s}-{:%Y%m%d_%H%M%S}.{:s}"
         self.EXTENSION = 'jpg'
 
+        self.removedata = {
+            'Eyeleft' : "../EyeLeft",
+            'Eyeright' : "../EyeRight",
+            'Face' : "../Face",
+            'Mouth' : "../Mouth",
+            'Nose' : "../Nose"
+        }
+
+        self.deleteFolder = ['EyeLeft', 'EyeRight', 'Face', 'Mouth', 'Nose']
+
     def CheckCamera(self):
         if not self.cap:
             return False
@@ -35,6 +46,7 @@ class FaceDetection:
 
     def VideoCaptrue(self):
         Checkresult = self.CheckCamera()
+        self.removedata_Detection()
 
         if Checkresult:
             while True:
@@ -48,6 +60,11 @@ class FaceDetection:
                     return False
         else:
             print("No have camera !!!")
+
+    def removedata_Detection(self):
+        for filepath in self.deleteFolder:
+            shutil.rmtree('./' + filepath, ignore_errors = True)
+            os.mkdir(filepath)
 
     def DetectionAI(self):
         try:
@@ -67,6 +84,7 @@ class FaceDetection:
             x1, y1 = x + w, y + h
 
             self.roi_img = self.img[y : y + h, x : x + w]
+            self.roi_img1 = self.roi_img.copy()
 
             self.date = datetime.now()
             outfile = self.filenameFormat.format("Face", "Face", self.date, self.EXTENSION)
@@ -93,11 +111,10 @@ class FaceDetection:
             cv2.putText(self.img, self.result['dominant_emotion'] + " " + str(self.result['age']), (x, y - d), self.font, 2, (0, 255, 0), 2)
 
     def DectectionEye(self):
-        self.Eye = self.haarcascades['eye'].detectMultiScale(self.roi_img, 1.7, 8)
-        roieye_img = self.roi_img
+        self.Eye = self.haarcascades['eye'].detectMultiScale(self.roi_img1, 1.7, 8)
 
         for (x, y, w, h) in self.Eye:
-            cv2.rectangle(roieye_img, (x, y),(x + w, y + h), (255, 255, 0), 1)
+            cv2.rectangle(self.roi_img, (x, y),(x + w, y + h), (255, 255, 0), 1)
         else:
             if len(self.Eye) == 1:
                 print("No can't detection left or right Eye")
@@ -106,37 +123,40 @@ class FaceDetection:
                     xr, yr, wr, hr = self.Eye[0]
                     xl, yl, wl, hl = self.Eye[1]
 
-                    EyeRight_Image = self.roi_img[yr : yr + hr, xr : xr + wr]
+                    EyeRight_Image = self.roi_img1[yr : yr + hr, xr : xr + wr]
                     outfile = self.filenameFormat.format("EyeRight", "EyeRight", self.date, self.EXTENSION)
                     cv2.imwrite(outfile, EyeRight_Image)
 
-                    EyeLeft_Image = self.roi_img[yl : yl + hl, xl : xl + wl]
+                    EyeLeft_Image = self.roi_img1[yl : yl + hl, xl : xl + wl]
                     outfile = self.filenameFormat.format("EyeLeft", "EyeLeft", self.date, self.EXTENSION)
                     cv2.imwrite(outfile, EyeLeft_Image)
 
     def DectectionMouth(self):
-        self.Mouth = self.cascadefile['mouth'].detectMultiScale(self.roi_img, 1.7, 8)
-        roimouth_img = self.roi_img
+        self.Mouth = self.cascadefile['mouth'].detectMultiScale(self.roi_img1, 1.7, 8)
 
         for (x , y, w, h) in self.Mouth:
-            mouthimage = self.roi_img[y : y + h, x : x + w]
+            w = w + 20
+            mouthimage = self.roi_img1[y : y + h, x : x + w]
 
             outfile = self.filenameFormat.format("Mouth", "Mouth", self.date, self.EXTENSION)
             cv2.imwrite(outfile, mouthimage)
 
-            cv2.rectangle(roimouth_img, (x, y),(x + w, y + h), (255, 0, 0), 1) 
+            cv2.rectangle(self.roi_img, (x, y),(x + w, y + h), (255, 0, 0), 1) 
 
     def DectectionNose(self):
-        self.Nose = self.cascadefile['nose'].detectMultiScale(self.roi_img, 1.7, 4)
-        roinose_img = self.roi_img
+        self.Nose = self.cascadefile['nose'].detectMultiScale(self.roi_img1, 1.7, 4)
 
-        for (x , y, w, h) in self.Nose:
-            noseimage = self.roi_img[y : y + h, x : x + w]
+        for (x, y, w, h) in self.Nose:
+            x = x + 10
+            y = y + 10
+            w = w - 15
+            h = h - 25
+            noseimage = self.roi_img1[y : y + h, x : x + w]
 
             outfile = self.filenameFormat.format("Nose", "Nose", self.date, self.EXTENSION)
             cv2.imwrite(outfile, noseimage)
 
-            cv2.rectangle(roinose_img, (x, y),(x + w, y + h), (0, 255, 255), 1) 
+            cv2.rectangle(self.roi_img, (x, y),(x + w , y + h), (0, 255, 255), 1) 
 
     def __call__(self):
         self.VideoCaptrue()
