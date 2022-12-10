@@ -28,6 +28,7 @@ class FaceDetection:
         self.filenameFormat = "{:s}/{:s}-{:%Y%m%d_%H%M%S}.{:s}"
         self.EXTENSION = 'jpg'
         self.isSaveFile = []
+        self.isSavefFileName = []
 
         self.removedata = {
             'Eyeleft' : "../EyeLeft",
