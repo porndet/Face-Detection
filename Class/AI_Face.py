@@ -27,8 +27,6 @@ class FaceDetection:
         self.colorGreen = (0, 255, 0)
         self.filenameFormat = "{:s}/{:s}-{:%Y%m%d_%H%M%S}.{:s}"
         self.EXTENSION = 'jpg'
-        self.isSaveFile = []
-        self.isSavefFileName = []
 
         self.removedata = {
             'Eyeleft' : "../EyeLeft",
@@ -76,11 +74,6 @@ class FaceDetection:
             self.DectectionEye()
             self.DectectionMouth()
             self.DectectionNose()
-
-            print("Items in saveFile : {0}".format(len(self.isSaveFile)))
-
-            self.isSaveFile = []
-
         except:
             return False
 
@@ -96,8 +89,6 @@ class FaceDetection:
             self.date = datetime.now()
             outfile = self.filenameFormat.format("Face", "Face", self.date, self.EXTENSION)
             cv2.imwrite(outfile, self.roi_img)
-
-            self.isSaveFile.append(True)
 
             cv2.rectangle(self.img, (x, y), (x + w, y + h), self.colorGreen, 1) 
 
@@ -135,23 +126,20 @@ class FaceDetection:
                     EyeRight_Image = self.roi_img1[yr : yr + hr, xr : xr + wr]
                     outfile = self.filenameFormat.format("EyeRight", "EyeRight", self.date, self.EXTENSION)
                     cv2.imwrite(outfile, EyeRight_Image)
-                    self.isSaveFile.append(True)
 
                     EyeLeft_Image = self.roi_img1[yl : yl + hl, xl : xl + wl]
                     outfile = self.filenameFormat.format("EyeLeft", "EyeLeft", self.date, self.EXTENSION)
                     cv2.imwrite(outfile, EyeLeft_Image)
-                    self.isSaveFile.append(True)
+
 
     def DectectionMouth(self):
         self.Mouth = self.cascadefile['mouth'].detectMultiScale(self.roi_img1, 1.7, 8)
 
         for (x , y, w, h) in self.Mouth:
-            w = w + 20
-            mouthimage = self.roi_img1[y : y + h, x : x + w]
+            mouthimage = self.roi_img1[y : y + h, x : x + w + 15]
 
             outfile = self.filenameFormat.format("Mouth", "Mouth", self.date, self.EXTENSION)
             cv2.imwrite(outfile, mouthimage)
-            self.isSaveFile.append(True)
 
             cv2.rectangle(self.roi_img, (x, y),(x + w, y + h), (255, 0, 0), 1) 
 
@@ -159,15 +147,10 @@ class FaceDetection:
         self.Nose = self.cascadefile['nose'].detectMultiScale(self.roi_img1, 1.7, 4)
 
         for (x, y, w, h) in self.Nose:
-            x = x + 10
-            y = y + 10
-            w = w - 15
-            h = h - 25
             noseimage = self.roi_img1[y : y + h, x : x + w]
 
             outfile = self.filenameFormat.format("Nose", "Nose", self.date, self.EXTENSION)
             cv2.imwrite(outfile, noseimage)
-            self.isSaveFile.append(True)
 
             cv2.rectangle(self.roi_img, (x, y),(x + w , y + h), (0, 255, 255), 1) 
 
