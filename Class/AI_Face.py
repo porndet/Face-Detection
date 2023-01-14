@@ -3,6 +3,7 @@ from deepface import DeepFace
 from datetime import datetime
 import shutil
 import os
+from Class.mysqlconnection import MariaDB
 
 class FaceDetection:
     def __init__(self):
@@ -42,7 +43,12 @@ class FaceDetection:
         self.EyeRight_Size = {"X" : 0, "Y" : 0} 
         self.Nose_Size = {"X" : 0, "Y" : 0} 
         self.Mouth_Size = {"X" : 0, "Y" : 0} 
-        
+
+        self.MqSQl = MariaDB()
+        self.MqSQlEyeLeft = MariaDB()
+        self.MqSQlEyeRight = MariaDB()
+        self.MqSQlMouth = MariaDB()
+        self.MqSQlNose = MariaDB()
 
     def CheckCamera(self):
         if not self.cap:
@@ -76,6 +82,7 @@ class FaceDetection:
         try:
             self.result = DeepFace.analyze(self.img, actions = ['age', 'emotion'])
             self.gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
+
             self.DetectionFace()
             self.DectectionEye()
             self.DectectionMouth()
@@ -103,6 +110,11 @@ class FaceDetection:
             self.date = datetime.now()
             outfile = self.filenameFormat.format("Face", "Face", self.date, self.EXTENSION)
             cv2.imwrite(outfile, self.roi_img)
+
+            self.MqSQl.InsertDataFace(outfile)
+
+            # MariaDB.InsertDataFace(outfile, 10, 10)
+            
 
             cv2.rectangle(self.img, (x, y), (x + w, y + h), self.colorGreen, 1) 
 
@@ -140,14 +152,12 @@ class FaceDetection:
                     EyeRight_Image = self.roi_img1[yr : yr + hr, xr : xr + wr]
                     outfile = self.filenameFormat.format("EyeRight", "EyeRight", self.date, self.EXTENSION)
                     cv2.imwrite(outfile, EyeRight_Image)
-                    self.EyeLeft_Size["Y"] = yr + hr
-                    self.EyeLeft_Size["X"] = xr + wr
+                    self.MqSQlEyeRight.InsertDataPath("eyeright", outfile, int(xr + wr), int(yr + hr))
 
                     EyeLeft_Image = self.roi_img1[yl : yl + hl, xl : xl + wl]
                     outfile = self.filenameFormat.format("EyeLeft", "EyeLeft", self.date, self.EXTENSION)
                     cv2.imwrite(outfile, EyeLeft_Image)
-                    self.EyeRight_Size["Y"] = yl + hl
-                    self.EyeRight_Size["X"] = xl + wl
+                    self.MqSQlEyeLeft.InsertDataPath("eyeleft", outfile, int(xl + wl), int(yl + hl))
 
 
     def DectectionMouth(self):
@@ -158,8 +168,8 @@ class FaceDetection:
 
             outfile = self.filenameFormat.format("Mouth", "Mouth", self.date, self.EXTENSION)
             cv2.imwrite(outfile, mouthimage)
-            self.Mouth_Size["Y"] = y + h
-            self.Mouth_Size["X"] =  x + w
+
+            self.MqSQlMouth.InsertDataPath("mouth", outfile, int(x + w), int(y + h))
 
             cv2.rectangle(self.roi_img, (x, y),(x + w, y + h), (255, 0, 0), 1) 
 
@@ -171,8 +181,8 @@ class FaceDetection:
 
             outfile = self.filenameFormat.format("Nose", "Nose", self.date, self.EXTENSION)
             cv2.imwrite(outfile, noseimage)
-            self.Nose_Size["Y"] = y + h
-            self.Nose_Size["X"] =  x + w
+
+            self.MqSQlNose.InsertDataPath("nose", outfile, int(x + w), int(y + h))
 
             cv2.rectangle(self.roi_img, (x, y),(x + w , y + h), (0, 255, 255), 1) 
 
