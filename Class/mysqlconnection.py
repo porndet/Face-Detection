@@ -9,18 +9,27 @@ class MariaDB:
             host = "localhost",
             user = "root",
             password = "",
-            database = "systemsecurity"
+            database = "unityserver"
         )
 
-    def InsertData(self, Data, Data2, Data3):
+    def InsertDataFace(self, file_path, coor_X, coor_Y):
         self.MysqlConnector()
 
         self.Mycursor = self.mydb.cursor()
-        sql = "INSERT INTO record (speed, distance, date) values (%s, %s, %s)"
-        data_user = (Data, Data2, Data3)
+        sql = "INSERT INTO face (filename, coor_x, coor_y) values (%s, %s, %s)"
+        data_user = (file_path, coor_X, coor_Y)
 
         self.Mycursor.execute(sql, data_user)
+        self.CloseDatabase_Cursor()
 
+    def InsertDataPath(self, file_path, coor_X, coor_Y):
+        self.MysqlConnector()
+
+        self.Mycursor = self.mydb.cursor()
+        sql = "INSERT INTO facepath (filename, coor_x, coor_y) values (%s, %s, %s)"
+        data_user = (file_path, coor_X, coor_Y)
+
+        self.Mycursor.execute(sql, data_user)
         self.CloseDatabase_Cursor()
 
     def CloseDatabase_Cursor(self):

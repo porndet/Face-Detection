@@ -38,6 +38,12 @@ class FaceDetection:
 
         self.deleteFolder = ['EyeLeft', 'EyeRight', 'Face', 'Mouth', 'Nose']
 
+        self.EyeLeft_Size = {"X" : 0, "Y" : 0} 
+        self.EyeRight_Size = {"X" : 0, "Y" : 0} 
+        self.Nose_Size = {"X" : 0, "Y" : 0} 
+        self.Mouth_Size = {"X" : 0, "Y" : 0} 
+        
+
     def CheckCamera(self):
         if not self.cap:
             return False
@@ -74,6 +80,14 @@ class FaceDetection:
             self.DectectionEye()
             self.DectectionMouth()
             self.DectectionNose()
+
+            # print("\n")
+            # print("EyeLeft : ", self.EyeLeft_Size)
+            # print("EyeRight : ", self.EyeRight_Size)
+            # print("Mouth : ", self.Mouth_Size)
+            # print("Nose", self.Nose_Size)
+            # print("\n")
+
         except:
             return False
 
@@ -126,10 +140,14 @@ class FaceDetection:
                     EyeRight_Image = self.roi_img1[yr : yr + hr, xr : xr + wr]
                     outfile = self.filenameFormat.format("EyeRight", "EyeRight", self.date, self.EXTENSION)
                     cv2.imwrite(outfile, EyeRight_Image)
+                    self.EyeLeft_Size["Y"] = yr + hr
+                    self.EyeLeft_Size["X"] = xr + wr
 
                     EyeLeft_Image = self.roi_img1[yl : yl + hl, xl : xl + wl]
                     outfile = self.filenameFormat.format("EyeLeft", "EyeLeft", self.date, self.EXTENSION)
                     cv2.imwrite(outfile, EyeLeft_Image)
+                    self.EyeRight_Size["Y"] = yl + hl
+                    self.EyeRight_Size["X"] = xl + wl
 
 
     def DectectionMouth(self):
@@ -140,6 +158,8 @@ class FaceDetection:
 
             outfile = self.filenameFormat.format("Mouth", "Mouth", self.date, self.EXTENSION)
             cv2.imwrite(outfile, mouthimage)
+            self.Mouth_Size["Y"] = y + h
+            self.Mouth_Size["X"] =  x + w
 
             cv2.rectangle(self.roi_img, (x, y),(x + w, y + h), (255, 0, 0), 1) 
 
@@ -151,6 +171,8 @@ class FaceDetection:
 
             outfile = self.filenameFormat.format("Nose", "Nose", self.date, self.EXTENSION)
             cv2.imwrite(outfile, noseimage)
+            self.Nose_Size["Y"] = y + h
+            self.Nose_Size["X"] =  x + w
 
             cv2.rectangle(self.roi_img, (x, y),(x + w , y + h), (0, 255, 255), 1) 
 
