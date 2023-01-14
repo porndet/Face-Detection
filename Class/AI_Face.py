@@ -182,7 +182,7 @@ class FaceDetection:
             outfile = self.filenameFormat.format("Nose", "Nose", self.date, self.EXTENSION)
             cv2.imwrite(outfile, noseimage)
 
-            self.MqSQlNose.InsertDataPath("nose", outfile, int(x + w), int(y + h))
+            self.MqSQlNose.InsertDataPath("nose", "Nose", int(x + w), int(y + h))
 
             cv2.rectangle(self.roi_img, (x, y),(x + w , y + h), (0, 255, 255), 1) 
 
