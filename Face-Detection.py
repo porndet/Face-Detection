@@ -7,5 +7,4 @@ DetectionFace()
 # MB = MariaDB()
 # MB.InsertDataPath("eyeleft", "Hello world", 10, 10)
 
-
 # print(DetectionFace)
