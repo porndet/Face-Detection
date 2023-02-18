@@ -73,7 +73,7 @@ black_img = cv2.imread(Data.black_img)
 
 draw_color_point = ""
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 count = 0
 
 databasen1.Deletedatabase('temp')
@@ -142,10 +142,12 @@ while True:
             cv2.imwrite('../img/nose/nose_' +  nose_name + '.jpg',nose_img)
             cv2.imwrite(path + '/img/nose/nose_' +  nose_name + '.jpg', nose_img)
             nose_path = str('./img/nose/nose_' + nose_name + '.jpg')
-            databasen1.database_input('temp', 'nose', x, y, nose_path)
+
+            databasen1.database_input('temp', 'nose', int(x), int(y), nose_path)
             
         #口
-        mouth_list = cascade_mouth.detectMultiScale(img_gray,  scaleFactor=1.2, minNeighbors=7 ,minSize=(65,65))
+        mouth_list = cascade_mouth.detectMultiScale(img_gray,  1.7, 8)
+        # mouth_list = Data.cascade_mouth1.detectMultiScale(img_gray,  scaleFactor=1.2, minNeighbors=7 ,minSize=(65,65))
         # print("口　", mouth_list)
         if len(mouth_list) == 0:
             # print("きた")
@@ -172,7 +174,7 @@ while True:
             cv2.imwrite('../img/mouth/mouth_' +  mouth_name + '.jpg', mouth_img)
             cv2.imwrite(path + '/img/mouth/mouth_' +  mouth_name + '.jpg', mouth_img)
             mouth_path = str('./img/mouth/mouth_' +  mouth_name + '.jpg')
-            databasen1.database_input('temp', 'mouth', x, y, mouth_path)
+            databasen1.database_input('temp', 'mouth', int(x), int(y), mouth_path)
             
         #目
         eye_list = cascade_eye.detectMultiScale(img_gray, scaleFactor=1.1, minNeighbors=10)
